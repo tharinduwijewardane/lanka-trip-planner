@@ -11,6 +11,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+/**
+ * @author Tharindu Wijewardane
+ *
+ */
 public class Database {
 
 	private static final String DATABASE_NAME = "lankatripplanner_db";

@@ -1,7 +1,8 @@
 package com.lanka.tripplanner.util;
 
 /**
- * Class for storing constant values
+ * @author Tharindu Wijewardane
+ *
  */
 public class ConstVals {
 

@@ -8,7 +8,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
 /**
- * Class to handle the saving and fetching shared preferences
+ * @author Tharindu Wijewardane
+ *
  */
 public class PreferenceHelp {
 
