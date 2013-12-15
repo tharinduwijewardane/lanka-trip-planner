@@ -55,8 +55,8 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 
 	GoogleMapV2Direction googleMapV2Direction;
 
-	 private static final LatLng BRISBANE = new LatLng(6.9, 80.89);
-	 private static final LatLng MELBOURNE = new LatLng(6.79, 79.89);
+	 private static final LatLng PLACE1 = new LatLng(6.9, 80.89);
+	 private static final LatLng PLACE2 = new LatLng(6.79, 79.89);
 	private LatLng markerLocation;
 
 	private GoogleMap mMap;
@@ -83,7 +83,7 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 
 		initVals(); // initialize variables
 		
-		drawLine(MELBOURNE, BRISBANE);
+		drawLine(PLACE2, PLACE1);
 	}
 
 	@Override
@@ -141,7 +141,7 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 
 		// to get the previously saved position to initially pan to it
 //		markerLocation = new LatLng(latitude, longitude);
-		markerLocation = MELBOURNE;
+		markerLocation = PLACE2;
 
 		// Creates a draggable marker. Long press to drag.
 		mMarker = mMap.addMarker(new MarkerOptions().position(markerLocation).title("Marker")
