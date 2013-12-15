@@ -47,6 +47,12 @@
             android:configChanges="orientation|keyboardHidden"
             android:windowSoftInputMode="adjustPan" >
         </activity>
+        <activity
+            android:name="com.lanka.tripplanner.ui.ResultMapActivity"
+            android:label="@string/app_name"
+            android:configChanges="orientation|keyboardHidden"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
     </application>
 
 </manifest>
