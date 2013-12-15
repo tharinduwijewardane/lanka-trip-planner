@@ -113,7 +113,8 @@ public class MainActivity extends Activity {
 				
 				// call
 				
-				
+				Intent intent = new Intent(getApplicationContext(), ResultMapActivity.class);
+				startActivity(intent);
 			}
 		});
 		
