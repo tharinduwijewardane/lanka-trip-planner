@@ -3,56 +3,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    
+
     <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="Show My Location Details:" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="Show My Location Details:" />
 
-                <CheckBox
-                    android:id="@+id/cbMyLocInfo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleX="0.7"
-                    android:scaleY="0.7"
-                    android:layout_centerVertical="true"
-                    android:layout_alignParentRight="true"
-                    android:text="" />
-
-            </RelativeLayout>
+        <CheckBox
+            android:id="@+id/cbMyLocInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:scaleX="0.7"
+            android:scaleY="0.7"
+            android:text="" />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/tvMapMsg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="2dp" >
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Marker Details:" />
-
-        <!--
-              <Button 
-                android:id="@+id/get_my_location_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="showMyLocation"
-                android:text="My location" />      
-      -->
-
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -73,7 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:text="84763284632" />
+            android:text="123" />
     </LinearLayout>
 
     <LinearLayout
@@ -95,12 +72,13 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:text="738468327" />
+            android:text="123" />
     </LinearLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="wrap_content"
+         >
 
         <fragment
             android:id="@+id/map"
@@ -108,5 +86,19 @@
             android:layout_height="match_parent"
             class="com.google.android.gms.maps.SupportMapFragment" />
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/linOk"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:padding="2dp" >
+
+        <Button
+            android:id="@+id/bMapOk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="OK" />
+    </LinearLayout>
 
 </LinearLayout>

@@ -19,7 +19,7 @@ public class PreferenceHelp {
 	Context context;
 
 	public PreferenceHelp(Context context) {
-		this.filename = "prefs_th"; // default filename hard coded
+		this.filename = "prefs_lanka_trip_planner"; // default filename hard coded
 		prefData = context.getSharedPreferences(filename, 0);
 	}
 
