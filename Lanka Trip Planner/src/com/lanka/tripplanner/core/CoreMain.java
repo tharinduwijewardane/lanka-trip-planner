@@ -1,10 +1,10 @@
 package com.lanka.tripplanner.core;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class CoreMain {
 
-	public LinkedList<Location> searchPath(int noDays, double srcLongi,
+	public ArrayList<Locale> searchPath(int noDays, double srcLongi,
 			double srcLati, String category, String province) {
 
 		int expectedTime;
@@ -32,7 +32,7 @@ public class CoreMain {
 		Destination dest1 = new Destination(expectedTime, srcLati, srcLongi);
 		Source src1 = new Source(srcLati, srcLongi);
 
-		Location[] places = { Anuradhapura, Peradeniya, Nilaweli, Polonnaruwa,
+		Locale[] places = { Anuradhapura, Peradeniya, Nilaweli, Polonnaruwa,
 				GalleFort, Katharagama };
 
 		int[] srcTimeToTravel = new int[places.length];
@@ -68,7 +68,7 @@ public class CoreMain {
 		}
 
 		Map aMap = new Map(src1, dest1);
-		LinkedList<Location> road = aMap.getPath(category, province);
+		ArrayList<Locale> road = aMap.getPath(category, province);
 
 		return road;
 	}

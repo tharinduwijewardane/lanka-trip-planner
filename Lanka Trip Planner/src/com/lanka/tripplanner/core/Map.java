@@ -1,22 +1,42 @@
 package com.lanka.tripplanner.core;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
+import android.util.Log;
 
 class Map {
-	public Location source;
+	public Locale source;
 	public Destination destination;
 
-	public Map(Location src, Destination dest) {
+	public Map(Locale src, Destination dest) {
 		source = src;
 		destination = dest;
 	}
 
 	// this should be called to get the best path
-	public LinkedList<Location> getPath(String aCategory, String aProvince) {
+	public ArrayList<Locale> getPath(String aCategory, String aProvince) {
 
-		LinkedList<Location> path = new LinkedList<Location>(); // path
-		Location temp = source;
+		ArrayList<Locale> path = new ArrayList<Locale>(); // path
+		Locale temp = source;
+
+		String[] categories;
+		if (aCategory != null) {
+			if (aCategory.contains(",")) {
+				categories = aCategory.split(",");
+			} else {
+				categories = new String[1];
+				categories[0] = aCategory;
+				Log.v("Map", categories[0]);
+			}
+		} else {
+			categories = new String[1];
+			categories[0] = "All";
+		}
+
+		if (aProvince == null) {
+			aProvince = "All";
+		}
+
 		int i = 1;
 		while (temp != null) {
 
@@ -25,9 +45,10 @@ class Map {
 
 				// only visiting 14hrs for a day
 				// checks whether visiting ends for the day
-				if (temp.timeOfPath > (840 * i) && path.getLast() != null) {
-					Location dayDestination = path.getLast();
-					path.removeLast();
+				if (temp.timeOfPath > (840 * i)
+						&& path.get(path.size() - 1) != null) {
+					Locale dayDestination = path.get(path.size() - 1);
+					path.remove(path.size() - 1);
 					dayDestination.setDestinationForDay(true);
 					path.add(dayDestination);
 					i++;
@@ -39,34 +60,22 @@ class Map {
 				break;
 			}
 
-			temp = getNextBestLoc(temp, aCategory, aProvince);
+			temp = getNextBestLoc(temp, categories, aProvince);
 		}
-		destination.timeOfPath = path.getLast().timeOfPath
-				+ path.getLast().timeToDestination;
-		destination.ratingOfPath = path.getLast().ratingOfPath;
+		destination.timeOfPath = path.get(path.size() - 1).timeOfPath
+				+ path.get(path.size() - 1).timeToDestination;
+		destination.ratingOfPath = path.get(path.size() - 1).ratingOfPath;
 		path.add(destination); // ading last node to the path
 		return path;
 	}
 
 	// get next best location to travel from a location
 	// out put may be null if a best location doesn't exsist
-	public Location getNextBestLoc(Location loc, String aCategory,
+	public Locale getNextBestLoc(Locale loc, String[] categories,
 			String aProvince) {
-		boolean isNotInCategory = false;
+		boolean isNotInCategory = true;
 
-		Location bestLoc = null;
-
-		String[] categories;
-		if (aCategory != null) {
-			categories = aCategory.split(",");
-		} else {
-			categories = new String[1];
-			categories[0] = "All";
-		}
-
-		if (aProvince == null) {
-			aProvince = "All";
-		}
+		Locale bestLoc = null;
 
 		int bestHeuristic = destination.expectedTime;
 		Iterator<Neighbour> ittr = loc.getNeighbours();
@@ -78,28 +87,33 @@ class Map {
 				continue;
 			}
 
-			for (int i = 0; i > categories.length; i++) {
-				if (neighbour.loc.type.equals("place")) {
-					if (!((Place) neighbour.loc).getCategory().equals(
-							categories[i])
-							&& !categories[0].equals("All")) {
-						isNotInCategory = true;
-						break;
-					}
-				}
-			}
-
-			if (isNotInCategory) {
+			// if the neighbour location is already in the path
+			if (neighbour.loc.alreadyInPath) {
 				continue;
 			}
 
+			// check whether the site is in the desired province
 			if (!((Place) neighbour.loc).getProvince().equals(aProvince)
 					&& !aProvince.equals("All")) {
 				continue;
 			}
 
-			// if the neighbour location is already in the path
-			if (neighbour.loc.alreadyInPath) {
+			// check whether the site suits the desired category
+			if (categories[0].equals("All")) {
+				isNotInCategory = false;
+			} else {
+				for (int i = 0; i < categories.length; i++) {
+					isNotInCategory = true;
+					if (((Place) neighbour.loc).getCategory().equals(
+							categories[i])) {
+						isNotInCategory = false;
+						break;
+					}
+				}
+			}
+
+			// if site is not in desired category
+			if (isNotInCategory) {
 				continue;
 			}
 
@@ -118,8 +132,10 @@ class Map {
 			// lowest huristic value is the best one here
 			// assumption: 1. rating can be taken only integers 0,1,2,3,4,5
 			// (timeToDest - timeTraveled) was the first part
-			int heuristicValue = (timeToDest) // TIME TO TRAVEL MUST BE REMOVED
-												// FOR A*
+			int heuristicValue = (timeToDest) // TIME TO TRAVEL
+												// MUST BE
+												// REMOVED
+					// FOR A*
 					- (timeToDest - timeTraveled)
 					* ((neighbour.loc.rating * 6) / 100);
 

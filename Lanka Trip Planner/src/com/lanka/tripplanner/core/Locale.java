@@ -2,7 +2,7 @@ package com.lanka.tripplanner.core;
 
 import java.util.Iterator;
 
-abstract class Location {
+public class Locale{
 	public double x, y; // x,y coordinates
 	public String type; // Eg: source, destination, place
 	public String name;
@@ -16,7 +16,7 @@ abstract class Location {
 	public Boolean alreadyInPath; // needed when path is calculated
 	public Boolean destinationForDay; // last location visiting within the day
 
-	public Location(String aType, double xCor, double yCor, String aProvince) {
+	public Locale(String aType, double xCor, double yCor, String aProvince) {
 		type = aType;
 		x = xCor;
 		y = yCor;
@@ -29,7 +29,7 @@ abstract class Location {
 		destinationForDay = false;
 	}
 
-	public Location(String aType, double xCor, double yCor) {
+	public Locale(String aType, double xCor, double yCor) {
 		type = aType;
 		x = xCor;
 		y = yCor;
@@ -42,7 +42,7 @@ abstract class Location {
 		destinationForDay = false;
 	}
 
-	public Location(String aType) {
+	public Locale(String aType) {
 		type = aType;
 		rating = 0;
 		ratingOfPath = 0;

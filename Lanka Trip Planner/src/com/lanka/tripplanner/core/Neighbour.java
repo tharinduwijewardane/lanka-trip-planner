@@ -2,9 +2,9 @@ package com.lanka.tripplanner.core;
 
 class Neighbour {
 	public int timeToTravel; // traveling time from a location
-	public Location loc; // neighbour location
+	public Locale loc; // neighbour location
 
-	public Neighbour(Location aLoc, int time) {
+	public Neighbour(Locale aLoc, int time) {
 		loc = aLoc;
 		timeToTravel = time;
 	}

@@ -1,7 +1,7 @@
 package com.lanka.tripplanner.core;
 
 //represents the destination (where the trip ends)
-class Destination extends Location {
+class Destination extends Locale {
 
     public int expectedTime; // the time allocated for the trip by user
 

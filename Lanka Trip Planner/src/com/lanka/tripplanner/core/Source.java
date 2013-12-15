@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 //represents source location (where the trip starts)
-class Source extends Location {
+class Source extends Locale {
 
     public Set<Neighbour> neighbours; // all other locations with time to travel
     // (not the physical neighbours

@@ -1,6 +1,7 @@
 package com.lanka.tripplanner.ui;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.w3c.dom.Document;
 
@@ -26,6 +27,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.lanka.tripplanner.R;
+import com.lanka.tripplanner.core.CoreMain;
+import com.lanka.tripplanner.core.Locale;
 import com.lanka.tripplanner.util.ConstVals;
 import com.lanka.tripplanner.util.PreferenceHelp;
 
@@ -58,6 +61,13 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 
 	private static final LatLng PLACE1 = new LatLng(6.9, 80.89);
 	private static final LatLng PLACE2 = new LatLng(6.79, 79.89);
+	
+	double sourceLatitude;
+	double sourceLongitude;
+	int numberOfDays;
+	String category;
+	String region;
+	
 	private LatLng markerLocation;
 
 	private GoogleMap mMap;
@@ -83,8 +93,13 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		setUpMapIfNeeded();
 
 		initVals(); // initialize variables
+		
+		numberOfDays = getIntent().getIntExtra("numberOfDays", 1);
+		category = getIntent().getStringExtra("category");
+		region = getIntent().getStringExtra("region");		
+		
 
-		new LongOperation().execute(PLACE1, PLACE2);
+		new LongOperation1().execute("");
 
 	}
 
@@ -104,28 +119,74 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 			mLocationClient.disconnect();
 		}
 	}
-
-	
-	// to call the async method to get directions from google API
-	private class LongOperation extends AsyncTask<LatLng, Void, Document> {
+		
+	private class LongOperation1 extends AsyncTask<String, Void, Locale[]> {
 
 		@Override
-		protected Document doInBackground(LatLng... params) {
-			Log.d("-MY-", "before doc");
+		protected Locale[] doInBackground(String... params) {
+			
+			CoreMain coreMain = new CoreMain();
+			Log.d("-MY-", "search path started");
+			List<Locale> pointsList = coreMain.searchPath(numberOfDays, sourceLongitude, sourceLatitude, category, region);
+			
+			Locale[] points = (Locale[]) pointsList.toArray();
 
-			Document doc = googleMapV2Direction.getDocument(params[0], params[1],
-					GoogleMapV2Direction.MODE_OF_DRIVING);
-
-			Log.d("-MY-", "after doc");
-
-			return doc;
+			return points;
 		}
 
 		@Override
-		protected void onPostExecute(Document doc) { // when done
+		protected void onPostExecute(Locale[] points) { // when done
 
-			ResultMapActivity.this.drawLine(doc); // draws the line on map
+				Log.d("-MY-", "done searching path");
+		
+		}
 
+		@Override
+		protected void onPreExecute() {
+		}
+
+		@Override
+		protected void onProgressUpdate(Void... values) {
+		}
+	}
+	
+	// to call the async method to get directions from google API
+	private class LongOperation2 extends AsyncTask<String, Void, List<Document>> {
+
+		@Override
+		protected List<Document> doInBackground(String... params) {
+			
+			CoreMain coreMain = new CoreMain();
+			List<Locale> pointsList = coreMain.searchPath(numberOfDays, sourceLongitude, sourceLatitude, category, region);
+			
+			Locale[] points = (Locale[]) pointsList.toArray();
+			List<Document> documents = new ArrayList<Document>();
+			
+			for(int i=1; i < points.length; i++){
+				
+				LatLng src = new LatLng(points[i-1].getLati(), points[i-1].getLongi());
+				LatLng des = new LatLng(points[i].getLati(), points[i].getLongi());
+				
+				Log.d("-MY-", "before doc "+i);
+				
+				Document doc = googleMapV2Direction.getDocument(src, des,
+						GoogleMapV2Direction.MODE_OF_DRIVING);
+				
+				Log.d("-MY-", "after doc "+i);
+				
+				documents.add(doc);
+			}
+
+			return documents;
+		}
+
+		@Override
+		protected void onPostExecute(List<Document> documents) { // when done
+
+			for(Document doc : documents){
+				ResultMapActivity.this.drawLine(doc); // draws the line on map
+			}
+			
 		}
 
 		@Override
@@ -164,9 +225,9 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 			prefHelp = new PreferenceHelp(getApplicationContext());
 		}
 		// retrieving values from prefs
-		double latitude = prefHelp.getPrefDouble(ConstVals.PREF_KEY_LAT);
-		double longitude = prefHelp.getPrefDouble(ConstVals.PREF_KEY_LON);
-
+		sourceLatitude = prefHelp.getPrefDouble(ConstVals.PREF_KEY_LAT);
+		sourceLongitude = prefHelp.getPrefDouble(ConstVals.PREF_KEY_LON);
+		
 		googleMapV2Direction = new GoogleMapV2Direction();
 
 		// to get the previously saved position to initially pan to it
@@ -195,8 +256,8 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		});
 
 		// mMessageView.setText(getResources().getString(R.string.instructions));
-		tvLat.setText(Double.toString(latitude));
-		tvLon.setText(Double.toString(longitude));
+		tvLat.setText(Double.toString(sourceLatitude));
+		tvLon.setText(Double.toString(sourceLongitude));
 
 	}
 

@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 //represents places on the way
-public class Place extends Location {
+public class Place extends Locale {
 
 	public Set<Neighbour> neighbours;
 	public String category;

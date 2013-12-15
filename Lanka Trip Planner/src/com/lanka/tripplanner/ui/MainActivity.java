@@ -31,8 +31,8 @@ public class MainActivity extends Activity {
 	private Button bSelectStartLoc;
 	private Button bGeneratePlan;
 	private TextView tvLocation;
-	private double latitude;
-	private double longitude;
+	private double sourceLatitude;
+	private double sourceLongitude;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -110,10 +110,10 @@ public class MainActivity extends Activity {
 				String category = (String) spInterests.getSelectedItem();
 				String region = (String) spRegion.getSelectedItem();
 				
-				
-				// call
-				
 				Intent intent = new Intent(getApplicationContext(), ResultMapActivity.class);
+				intent.putExtra("numberOfDays", numberOfDays);
+				intent.putExtra("category", category);
+				intent.putExtra("region", region);
 				startActivity(intent);
 			}
 		});
@@ -132,10 +132,10 @@ public class MainActivity extends Activity {
 
 	private void displayValues() {
 		
-		latitude = prefHelp.getPrefDouble(ConstVals.PREF_KEY_LAT);
-		longitude = prefHelp.getPrefDouble(ConstVals.PREF_KEY_LON);
+		sourceLatitude = prefHelp.getPrefDouble(ConstVals.PREF_KEY_LAT);
+		sourceLongitude = prefHelp.getPrefDouble(ConstVals.PREF_KEY_LON);
 
-		tvLocation.setText("Start Location:\n"+latitude+"\n"+longitude);
+		tvLocation.setText("Start Location:\n"+sourceLatitude+"\n"+sourceLongitude);
 
 	}
 
