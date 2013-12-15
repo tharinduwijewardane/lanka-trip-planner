@@ -19,8 +19,12 @@ import org.w3c.dom.NodeList;
 import com.google.android.gms.maps.model.LatLng;
 import android.util.Log;
 
+/**
+ * @author Chamath Sajeewa
+ *
+ */
 public class GoogleMapV2Direction {
-	
+
 	public final static String MODE_OF_DRIVING = "driving";
 	public final static String MODE_OF_WALKING = "walking";
 
@@ -29,9 +33,10 @@ public class GoogleMapV2Direction {
 
 	// used-ok
 	public Document getDocument(LatLng start, LatLng end, String mode) {
+
 		String url = "http://maps.googleapis.com/maps/api/directions/xml?" + "origin="
 				+ start.latitude + "," + start.longitude + "&destination=" + end.latitude + ","
-				+ end.longitude + "&sensor=false&units=metric&mode=driving";
+				+ end.longitude + "&sensor=false&units=metric&mode="+mode;
 		Log.d("url", url);
 		try {
 			HttpClient httpClient = new DefaultHttpClient();

@@ -33,6 +33,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -55,8 +56,8 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 
 	GoogleMapV2Direction googleMapV2Direction;
 
-	 private static final LatLng PLACE1 = new LatLng(6.9, 80.89);
-	 private static final LatLng PLACE2 = new LatLng(6.79, 79.89);
+	private static final LatLng PLACE1 = new LatLng(6.9, 80.89);
+	private static final LatLng PLACE2 = new LatLng(6.79, 79.89);
 	private LatLng markerLocation;
 
 	private GoogleMap mMap;
@@ -82,8 +83,9 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		setUpMapIfNeeded();
 
 		initVals(); // initialize variables
-		
-		drawLine(PLACE2, PLACE1);
+
+		new LongOperation().execute(PLACE1, PLACE2);
+
 	}
 
 	@Override
@@ -103,20 +105,46 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		}
 	}
 
-	private void drawLine(LatLng from, LatLng to) {
-		
-		Log.d("-MY-", "before doc");
+	
+	// to call the async method to get directions from google API
+	private class LongOperation extends AsyncTask<LatLng, Void, Document> {
 
-		Document doc = googleMapV2Direction.getDocument(from, to,
-				GoogleMapV2Direction.MODE_OF_DRIVING);
-		
-		Log.d("-MY-", "after doc");
-		
-		if(doc == null){
+		@Override
+		protected Document doInBackground(LatLng... params) {
+			Log.d("-MY-", "before doc");
+
+			Document doc = googleMapV2Direction.getDocument(params[0], params[1],
+					GoogleMapV2Direction.MODE_OF_DRIVING);
+
+			Log.d("-MY-", "after doc");
+
+			return doc;
+		}
+
+		@Override
+		protected void onPostExecute(Document doc) { // when done
+
+			ResultMapActivity.this.drawLine(doc); // draws the line on map
+
+		}
+
+		@Override
+		protected void onPreExecute() {
+		}
+
+		@Override
+		protected void onProgressUpdate(Void... values) {
+		}
+	}
+
+	/** draws the line segments on map. 
+	 *  should be called when Document from google api is returned */
+	private void drawLine(Document doc) {
+
+		if (doc == null) {
 			Log.d("-MY-", "doc is null");
 			return;
 		}
-
 		ArrayList<LatLng> directionPoint = googleMapV2Direction.getDirection(doc);
 
 		PolylineOptions rectLine = new PolylineOptions().width(3).color(Color.RED);
@@ -139,13 +167,15 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		double latitude = prefHelp.getPrefDouble(ConstVals.PREF_KEY_LAT);
 		double longitude = prefHelp.getPrefDouble(ConstVals.PREF_KEY_LON);
 
+		googleMapV2Direction = new GoogleMapV2Direction();
+
 		// to get the previously saved position to initially pan to it
-//		markerLocation = new LatLng(latitude, longitude);
-		markerLocation = PLACE2;
+		// markerLocation = new LatLng(latitude, longitude);
+		// markerLocation = PLACE2;
 
 		// Creates a draggable marker. Long press to drag.
-		mMarker = mMap.addMarker(new MarkerOptions().position(markerLocation).title("Marker")
-				.snippet("testing").draggable(true));
+		// mMarker = mMap.addMarker(new MarkerOptions().position(markerLocation).title("Marker")
+		// .snippet("testing").draggable(true));
 
 		mMessageView = (TextView) findViewById(R.id.tvMapMsg);
 		tvLat = (TextView) findViewById(R.id.tvLat);
@@ -309,10 +339,9 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 				// We check which build version we are using.
 				@Override
 				public void onGlobalLayout() {
-					LatLngBounds bounds = new LatLngBounds.Builder()
-					// .include(BRISBANE)
-					// .include(MELBOURNE)
-							.include(markerLocation) // saved marker pos
+					LatLngBounds bounds = new LatLngBounds.Builder().include(PLACE1)
+							.include(PLACE2)
+							// .include(markerLocation) // saved marker pos
 
 							.build();
 					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
