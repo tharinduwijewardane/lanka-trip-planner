@@ -61,13 +61,13 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 
 	private static final LatLng PLACE1 = new LatLng(6.9, 80.89);
 	private static final LatLng PLACE2 = new LatLng(6.79, 79.89);
-	
+
 	double sourceLatitude;
 	double sourceLongitude;
 	int numberOfDays;
 	String category;
 	String region;
-	
+
 	private LatLng markerLocation;
 
 	private GoogleMap mMap;
@@ -93,11 +93,10 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		setUpMapIfNeeded();
 
 		initVals(); // initialize variables
-		
+
 		numberOfDays = getIntent().getIntExtra("numberOfDays", 1);
 		category = getIntent().getStringExtra("category");
-		region = getIntent().getStringExtra("region");		
-		
+		region = getIntent().getStringExtra("region");
 
 		new LongOperation1().execute("");
 
@@ -119,16 +118,17 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 			mLocationClient.disconnect();
 		}
 	}
-		
+
 	private class LongOperation1 extends AsyncTask<String, Void, Locale[]> {
 
 		@Override
 		protected Locale[] doInBackground(String... params) {
-			
+
 			CoreMain coreMain = new CoreMain();
 			Log.d("-MY-", "search path started");
-			List<Locale> pointsList = coreMain.searchPath(numberOfDays, sourceLongitude, sourceLatitude, category, region);
-			
+			List<Locale> pointsList = coreMain.searchPath(numberOfDays, sourceLongitude,
+					sourceLatitude, category, region);
+
 			Locale[] points = (Locale[]) pointsList.toArray();
 
 			return points;
@@ -137,8 +137,8 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		@Override
 		protected void onPostExecute(Locale[] points) { // when done
 
-				Log.d("-MY-", "done searching path");
-		
+			Log.d("-MY-", "done searching path");
+
 		}
 
 		@Override
@@ -149,44 +149,28 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		protected void onProgressUpdate(Void... values) {
 		}
 	}
-	
+
 	// to call the async method to get directions from google API
-	private class LongOperation2 extends AsyncTask<String, Void, List<Document>> {
+	private class LongOperation2 extends AsyncTask<String, Void, Document> {
 
 		@Override
-		protected List<Document> doInBackground(String... params) {
-			
-			CoreMain coreMain = new CoreMain();
-			List<Locale> pointsList = coreMain.searchPath(numberOfDays, sourceLongitude, sourceLatitude, category, region);
-			
-			Locale[] points = (Locale[]) pointsList.toArray();
-			List<Document> documents = new ArrayList<Document>();
-			
-			for(int i=1; i < points.length; i++){
-				
-				LatLng src = new LatLng(points[i-1].getLati(), points[i-1].getLongi());
-				LatLng des = new LatLng(points[i].getLati(), points[i].getLongi());
-				
-				Log.d("-MY-", "before doc "+i);
-				
-				Document doc = googleMapV2Direction.getDocument(src, des,
-						GoogleMapV2Direction.MODE_OF_DRIVING);
-				
-				Log.d("-MY-", "after doc "+i);
-				
-				documents.add(doc);
-			}
+		protected Document doInBackground(String... params) {
 
-			return documents;
+			Log.d("-MY-", "before doc ");
+
+			Document doc = googleMapV2Direction.getDocument(PLACE1, PLACE2,
+					GoogleMapV2Direction.MODE_OF_DRIVING);
+
+			Log.d("-MY-", "after doc ");
+
+			return doc;
 		}
 
 		@Override
-		protected void onPostExecute(List<Document> documents) { // when done
+		protected void onPostExecute(Document doc) { // when done
 
-			for(Document doc : documents){
-				ResultMapActivity.this.drawLine(doc); // draws the line on map
-			}
-			
+			ResultMapActivity.this.drawLine(doc); // draws the line on map
+
 		}
 
 		@Override
@@ -198,8 +182,9 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		}
 	}
 
-	/** draws the line segments on map. 
-	 *  should be called when Document from google api is returned */
+	/**
+	 * draws the line segments on map. should be called when Document from google api is returned
+	 */
 	private void drawLine(Document doc) {
 
 		if (doc == null) {
@@ -227,7 +212,7 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		// retrieving values from prefs
 		sourceLatitude = prefHelp.getPrefDouble(ConstVals.PREF_KEY_LAT);
 		sourceLongitude = prefHelp.getPrefDouble(ConstVals.PREF_KEY_LON);
-		
+
 		googleMapV2Direction = new GoogleMapV2Direction();
 
 		// to get the previously saved position to initially pan to it
