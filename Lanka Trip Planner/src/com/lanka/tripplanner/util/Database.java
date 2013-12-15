@@ -67,6 +67,8 @@ public class Database {
 		public void onCreate(SQLiteDatabase db) {
 			db.execSQL(TABLE_PLACE_CREATE);
 			db.execSQL(TABLE_TIME_CREATE);
+			
+			//TODO use here to initialize the database with initial data
 		}
 
 		@Override
@@ -142,6 +144,23 @@ public class Database {
 		cv.put(KEY_TIME_TO_TRAVEL, timeToTravel);
 		
 		return mSqLiteDatabase.insert(DATABASE_TABLE_TIME, null, cv);
+	}
+	
+	/**
+	 * @param from
+	 * @param to
+	 * @return time to travel from "from" to "to"
+	 */
+	public int getTimeToTravel(String from, String to){
+		
+		Cursor c = mSqLiteDatabase.query(
+				DATABASE_TABLE_TIME,
+                new String[] { KEY_TIME_TO_TRAVEL },
+                KEY_FROM + "=" + from +" AND "+KEY_TO + "=" + to,
+                null, null, null, null, null
+        );
+					
+		return c.getInt(0);
 	}
 	
 	
