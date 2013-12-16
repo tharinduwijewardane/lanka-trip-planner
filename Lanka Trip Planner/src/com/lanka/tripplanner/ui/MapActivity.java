@@ -61,7 +61,6 @@ public class MapActivity extends FragmentActivity implements
 	private TextView mMessageView;
 	private TextView tvLat;
 	private TextView tvLon;
-	private CheckBox cbMyLocInfo;
 
 //	private Marker mBrisbane;
 //	private Marker mMelbourne;
@@ -113,21 +112,8 @@ public class MapActivity extends FragmentActivity implements
 		mMessageView = (TextView) findViewById(R.id.tvMapMsg);
 		tvLat = (TextView) findViewById(R.id.tvLat);
 		tvLon = (TextView) findViewById(R.id.tvLon);
-		cbMyLocInfo = (CheckBox) findViewById(R.id.cbMyLocInfo);
-		cbMyLocInfo.setOnCheckedChangeListener(new OnCheckedChangeListener() {			
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				isMyLocInfoEnabled = isChecked;
-				if(isMyLocInfoEnabled){
-					mMessageView.setText(msgText); //user location info
-				}else{
-					//instructions for user
-					mMessageView.setText("");
-				}
-			}
-		});
 
-//		mMessageView.setText(getResources().getString(R.string.instructions));
+		mMessageView.setText(getResources().getString(R.string.instructions));
 		tvLat.setText(Double.toString(latitude));
 		tvLon.setText(Double.toString(longitude));
 

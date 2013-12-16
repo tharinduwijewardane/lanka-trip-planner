@@ -4,18 +4,19 @@
     <string name="app_name">Lanka Trip Planner</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="instructions">Long click on map to select starting location</string>
     
     <string-array name="categories">
+        <item >Nature</item>
         <item >History</item>
-        <item >Nature</item>       
     </string-array>
     
     <string-array name="Regions">
-        <item >Southern</item>
         <item >Kandy</item>
         <item >Anuradhapura</item>
         <item >Katharagama</item>
         <item >Jafna</item>
+        <item >Trincomale</item>
     </string-array>
 
 </resources>

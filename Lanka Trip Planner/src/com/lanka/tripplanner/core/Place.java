@@ -87,4 +87,12 @@ public class Place extends Locale {
 	public void setProvince(String province) {
 		this.province = province;
 	}
+
+	public Integer getTimeToVisit() {
+		return timeToVisit;
+	}
+
+	public Integer getRating() {
+		return rating;
+	}
 }

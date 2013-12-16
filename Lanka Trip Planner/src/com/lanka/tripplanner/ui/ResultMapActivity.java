@@ -61,12 +61,14 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 
 	private static final LatLng PLACE1 = new LatLng(6.9, 80.89);
 	private static final LatLng PLACE2 = new LatLng(6.79, 79.89);
+	private static final LatLng PLACE3 = new LatLng(7.2, 81.5);
 
 	double sourceLatitude;
 	double sourceLongitude;
 	int numberOfDays;
 	String category;
 	String region;
+	CoreMain coreMain;
 
 	private LatLng markerLocation;
 
@@ -77,9 +79,6 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 	private String msgText;
 
 	private TextView mMessageView;
-	private TextView tvLat;
-	private TextView tvLon;
-	private CheckBox cbMyLocInfo;
 
 	// private Marker mBrisbane;
 	// private Marker mMelbourne;
@@ -98,6 +97,10 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		category = getIntent().getStringExtra("category");
 		region = getIntent().getStringExtra("region");
 
+		Log.d("-MY-", ""+numberOfDays);
+		Log.d("-MY-", category);
+		Log.d("-MY-", region);
+		
 		new LongOperation1().execute("");
 
 	}
@@ -119,30 +122,34 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		}
 	}
 
-	private class LongOperation1 extends AsyncTask<String, Void, Locale[]> {
+	private class LongOperation1 extends AsyncTask<String, Void, List<Locale>> {
 
 		@Override
-		protected Locale[] doInBackground(String... params) {
-
-			CoreMain coreMain = new CoreMain();
+		protected List<Locale> doInBackground(String... params) {
+			
 			Log.d("-MY-", "search path started");
 			List<Locale> pointsList = coreMain.searchPath(numberOfDays, sourceLongitude,
 					sourceLatitude, category, region);
 
-			Locale[] points = (Locale[]) pointsList.toArray();
-
-			return points;
+			return pointsList;
 		}
 
 		@Override
-		protected void onPostExecute(Locale[] points) { // when done
+		protected void onPostExecute(List<Locale> pointsList) { // when done
+			
+			mMessageView.setText("Path info fetched");
 
 			Log.d("-MY-", "done searching path");
+			for(Locale point : pointsList){
+				Log.d("-MY-", point.getName()+" "+point.getLati()+" "+point.getLongi() );			
+			}
+			
 
 		}
 
 		@Override
 		protected void onPreExecute() {
+			mMessageView.setText("Please wait.. Searching for path");
 		}
 
 		@Override
@@ -151,30 +158,40 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 	}
 
 	// to call the async method to get directions from google API
-	private class LongOperation2 extends AsyncTask<String, Void, Document> {
+	private class LongOperation2 extends AsyncTask<Locale, Void, Document[]> {
 
 		@Override
-		protected Document doInBackground(String... params) {
+		protected Document[] doInBackground(Locale... params) {
 
 			Log.d("-MY-", "before doc ");
 
 			Document doc = googleMapV2Direction.getDocument(PLACE1, PLACE2,
 					GoogleMapV2Direction.MODE_OF_DRIVING);
+			
+			Document doc2 = googleMapV2Direction.getDocument(PLACE2, PLACE3,
+					GoogleMapV2Direction.MODE_OF_DRIVING);
 
 			Log.d("-MY-", "after doc ");
 
-			return doc;
+			Document[] docs = new Document[2];
+			docs[0] = doc;
+			docs[1] = doc2;
+			return docs;
 		}
 
 		@Override
-		protected void onPostExecute(Document doc) { // when done
+		protected void onPostExecute(Document[] docs) { // when done
+			
+			mMessageView.setText("Directions are fetched successfully.");
 
-			ResultMapActivity.this.drawLine(doc); // draws the line on map
+			ResultMapActivity.this.drawLine(docs[0]); // draws the line on map
+			ResultMapActivity.this.drawLine(docs[1]);
 
 		}
 
 		@Override
 		protected void onPreExecute() {
+			mMessageView.setText("Please wait... Directions are being fetched");
 		}
 
 		@Override
@@ -214,7 +231,8 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		sourceLongitude = prefHelp.getPrefDouble(ConstVals.PREF_KEY_LON);
 
 		googleMapV2Direction = new GoogleMapV2Direction();
-
+		coreMain = new CoreMain(getApplicationContext());
+		
 		// to get the previously saved position to initially pan to it
 		// markerLocation = new LatLng(latitude, longitude);
 		// markerLocation = PLACE2;
@@ -224,25 +242,12 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		// .snippet("testing").draggable(true));
 
 		mMessageView = (TextView) findViewById(R.id.tvMapMsg);
-		tvLat = (TextView) findViewById(R.id.tvLat);
-		tvLon = (TextView) findViewById(R.id.tvLon);
-		cbMyLocInfo = (CheckBox) findViewById(R.id.cbMyLocInfo);
-		cbMyLocInfo.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				isMyLocInfoEnabled = isChecked;
-				if (isMyLocInfoEnabled) {
-					mMessageView.setText(msgText); // user location info
-				} else {
-					// instructions for user
-					mMessageView.setText("");
-				}
-			}
-		});
+//		tvLat = (TextView) findViewById(R.id.tvLat);
+//		tvLon = (TextView) findViewById(R.id.tvLon);
 
-		// mMessageView.setText(getResources().getString(R.string.instructions));
-		tvLat.setText(Double.toString(sourceLatitude));
-		tvLon.setText(Double.toString(sourceLongitude));
+		mMessageView.setText("-");
+//		tvLat.setText(Double.toString(sourceLatitude));
+//		tvLon.setText(Double.toString(sourceLongitude));
 
 	}
 
@@ -349,8 +354,8 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		mMarker = mMap.addMarker(new MarkerOptions().position(location).title("Marker")
 				.snippet("testing").draggable(true));
 
-		showPosition(location);
-		savePosition(location);
+//		showPosition(location);
+//		savePosition(location);
 
 	}
 
@@ -387,6 +392,7 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 				public void onGlobalLayout() {
 					LatLngBounds bounds = new LatLngBounds.Builder().include(PLACE1)
 							.include(PLACE2)
+							.include(PLACE3)
 							// .include(markerLocation) // saved marker pos
 
 							.build();
@@ -457,14 +463,14 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 	@Override
 	public void onMarkerDrag(Marker marker) {
 		LatLng location = marker.getPosition();
-		showPosition(location);
+//		showPosition(location);
 	}
 
 	@Override
 	public void onMarkerDragEnd(Marker marker) {
 		LatLng location = marker.getPosition();
-		showPosition(location);
-		savePosition(location);
+//		showPosition(location);
+//		savePosition(location);
 	}
 
 	@Override
@@ -475,20 +481,20 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 
 	/* end of marker methods */
 
-	// save location in prefs
-	private void savePosition(LatLng location) {
-
-		prefHelp.savePref(ConstVals.PREF_KEY_LAT, location.latitude);
-		prefHelp.savePref(ConstVals.PREF_KEY_LON, location.longitude);
-
-	}
-
-	// show lat and lon in text views
-	private void showPosition(LatLng location) {
-
-		tvLat.setText(Double.toString(location.latitude));
-		tvLon.setText(Double.toString(location.longitude));
-
-	}
+//	// save location in prefs
+//	private void savePosition(LatLng location) {
+//
+//		prefHelp.savePref(ConstVals.PREF_KEY_LAT, location.latitude);
+//		prefHelp.savePref(ConstVals.PREF_KEY_LON, location.longitude);
+//
+//	}
+//
+//	// show lat and lon in text views
+//	private void showPosition(LatLng location) {
+//
+//		tvLat.setText(Double.toString(location.latitude));
+//		tvLon.setText(Double.toString(location.longitude));
+//
+//	}
 
 }

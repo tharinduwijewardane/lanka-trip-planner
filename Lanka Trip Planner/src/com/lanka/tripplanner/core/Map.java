@@ -2,7 +2,6 @@ package com.lanka.tripplanner.core;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import android.util.Log;
 
 class Map {
 	public Locale source;
@@ -26,7 +25,6 @@ class Map {
 			} else {
 				categories = new String[1];
 				categories[0] = aCategory;
-				Log.v("Map", categories[0]);
 			}
 		} else {
 			categories = new String[1];
