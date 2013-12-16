@@ -6,11 +6,12 @@
     <string name="hello_world">Hello world!</string>
     
     <string-array name="categories">
-        <item >Nature</item>
         <item >History</item>
+        <item >Nature</item>       
     </string-array>
     
     <string-array name="Regions">
+        <item >Southern</item>
         <item >Kandy</item>
         <item >Anuradhapura</item>
         <item >Katharagama</item>
