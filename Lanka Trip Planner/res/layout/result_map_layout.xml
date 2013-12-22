@@ -14,10 +14,26 @@
             android:id="@+id/tvMapMsg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="16sp"
             android:gravity="center" />
     </LinearLayout>
 
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/linOk"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="2dp" >
+
+        <Button
+            android:id="@+id/bShowDetailsMap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Show Details" />
+    </LinearLayout>
+    
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
@@ -26,20 +42,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             class="com.google.android.gms.maps.SupportMapFragment" />
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/linOk"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:padding="2dp" >
-
-        <Button
-            android:id="@+id/bMapOk"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="OK" />
-    </LinearLayout>
+    </LinearLayout>    
 
 </LinearLayout>

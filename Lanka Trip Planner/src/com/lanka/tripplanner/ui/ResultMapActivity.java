@@ -42,7 +42,9 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -53,15 +55,17 @@ import android.widget.Toast;
  * @author Tharindu Wijewardane
  * 
  */
-public class ResultMapActivity extends FragmentActivity implements OnMyLocationButtonClickListener,
-		LocationListener, ConnectionCallbacks, OnConnectionFailedListener, OnMapLongClickListener,
+public class ResultMapActivity extends FragmentActivity implements
+		OnMyLocationButtonClickListener, LocationListener, ConnectionCallbacks,
+		OnConnectionFailedListener, OnMapLongClickListener,
 		OnMarkerClickListener, OnMarkerDragListener {
 
 	GoogleMapV2Direction googleMapV2Direction;
 
-	private static final LatLng PLACE1 = new LatLng(6.9, 80.89);
-	private static final LatLng PLACE2 = new LatLng(6.79, 79.89);
-	private static final LatLng PLACE3 = new LatLng(7.2, 81.5);
+	private static final LatLng NORTH = new LatLng(9.8188, 80.2060);
+	private static final LatLng SOUTH = new LatLng(5.9287, 80.6039);
+	private static final LatLng WEST = new LatLng(8.1807, 79.7074);
+	private static final LatLng EAST = new LatLng(7.2935, 81.8622);
 
 	double sourceLatitude;
 	double sourceLongitude;
@@ -79,10 +83,17 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 	private String msgText;
 
 	private TextView mMessageView;
+	
+	private Button bShowDetails;
 
 	// private Marker mBrisbane;
 	// private Marker mMelbourne;
 	private Marker mMarker;
+
+	private AsyncTask longOperation1;
+	private AsyncTask longOperation2;
+
+	private List<String> details;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -97,11 +108,11 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		category = getIntent().getStringExtra("category");
 		region = getIntent().getStringExtra("region");
 
-		Log.d("-MY-", ""+numberOfDays);
-		Log.d("-MY-", category);
-		Log.d("-MY-", region);
-		
-		new LongOperation1().execute("");
+		Log.d("-MY-", "" + numberOfDays);
+		Log.d("-MY-", "" + category);
+		Log.d("-MY-", "" + region);
+
+		longOperation1 = new LongOperation1().execute("");
 
 	}
 
@@ -122,28 +133,122 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		}
 	}
 
+	// @Override
+	// protected void onDestroy() {
+	// super.onDestroy();
+	// longOperation1.cancel(false);
+	// longOperation2.cancel(false);
+	// }
+
 	private class LongOperation1 extends AsyncTask<String, Void, List<Locale>> {
 
 		@Override
 		protected List<Locale> doInBackground(String... params) {
-			
+
 			Log.d("-MY-", "search path started");
-			List<Locale> pointsList = coreMain.searchPath(numberOfDays, sourceLongitude,
-					sourceLatitude, category, region);
+			List<Locale> pointsList = coreMain.searchPath(numberOfDays,
+					sourceLongitude, sourceLatitude, category, region);
 
 			return pointsList;
 		}
 
 		@Override
 		protected void onPostExecute(List<Locale> pointsList) { // when done
-			
+
 			mMessageView.setText("Path info fetched");
 
+			details = new ArrayList<String>();
+			String tempString = "";
+			int dayCounter = 1;
+			int i = 0; // to change markers
+
 			Log.d("-MY-", "done searching path");
-			for(Locale point : pointsList){
-				Log.d("-MY-", point.getName()+" "+point.getLati()+" "+point.getLongi() );			
+			for (Locale point : pointsList) {
+				Log.d("-MY-", point.getName() + " " + point.getLati() + " "
+						+ point.getLongi());
+
+				tempString += dayCounter + ":" + point.getName() + ":"
+						+ point.getTimeToVisit();
+
+				if (point.isDestinationForDay()) {
+					dayCounter++;
+				}
+
+				details.add(tempString);
+				
+				tempString = ""; //reset temp string
+
+				MarkerOptions markerOptions = new MarkerOptions();
+				markerOptions
+						.position(new LatLng(point.getLati(), point.getLongi()))
+						.title(point.getName()).snippet("Day "+dayCounter).draggable(false);
+
+				switch (i) { //to change marker icon
+				case 0:
+					markerOptions.icon(BitmapDescriptorFactory
+							.fromResource(R.drawable.mr));
+					break;
+				case 1:
+					markerOptions.icon(BitmapDescriptorFactory
+							.fromResource(R.drawable.m1));
+					break;
+				case 2:
+					markerOptions.icon(BitmapDescriptorFactory
+							.fromResource(R.drawable.m2));
+					break;
+				case 3:
+					markerOptions.icon(BitmapDescriptorFactory
+							.fromResource(R.drawable.m3));
+					break;
+				case 4:
+					markerOptions.icon(BitmapDescriptorFactory
+							.fromResource(R.drawable.m4));
+					break;
+				case 5:
+					markerOptions.icon(BitmapDescriptorFactory
+							.fromResource(R.drawable.m5));
+					break;
+				case 6:
+					markerOptions.icon(BitmapDescriptorFactory
+							.fromResource(R.drawable.m6));
+					break;
+				case 7:
+					markerOptions.icon(BitmapDescriptorFactory
+							.fromResource(R.drawable.m7));
+					break;
+				default:
+					markerOptions.icon(BitmapDescriptorFactory
+							.fromResource(R.drawable.me));
+					break;
+				}
+
+				i++;
+
+				if (!point.getName().equalsIgnoreCase("destination")) {
+					// avoid adding a marker to destination bcoz its same as
+					// source
+					mMarker = mMap.addMarker(markerOptions);
+				}
+
+				// private void addMarkersToMap() {
+				// // Uses a colored icon.
+				// mBrisbane = mMap.addMarker(new MarkerOptions()
+				// .position(BRISBANE)
+				// .title("Brisbane")
+				// .snippet("Population: 2,074,200")
+				// .icon(BitmapDescriptorFactory
+				// .defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+				//
+				// // Creates a draggable marker. Long press to drag.
+				// mMelbourne = mMap.addMarker(new
+				// MarkerOptions().position(MELBOURNE)
+				// .title("Melbourne").snippet("Population: 4,137,400")
+				// .draggable(true));
 			}
 			
+			bShowDetails.setEnabled(true); //enable show details button
+
+			longOperation2 = new LongOperation2().execute(pointsList);
 
 		}
 
@@ -158,34 +263,63 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 	}
 
 	// to call the async method to get directions from google API
-	private class LongOperation2 extends AsyncTask<Locale, Void, Document[]> {
+	private class LongOperation2 extends
+			AsyncTask<List<Locale>, Void, List<Document>> {
+
+		List<Locale> pontList;
 
 		@Override
-		protected Document[] doInBackground(Locale... params) {
+		protected List<Document> doInBackground(List<Locale>... params) {
 
 			Log.d("-MY-", "before doc ");
 
-			Document doc = googleMapV2Direction.getDocument(PLACE1, PLACE2,
-					GoogleMapV2Direction.MODE_OF_DRIVING);
-			
-			Document doc2 = googleMapV2Direction.getDocument(PLACE2, PLACE3,
-					GoogleMapV2Direction.MODE_OF_DRIVING);
+			mMessageView
+					.setText("Path info fetched. Waiting for directions...");
+
+			pontList = params[0];
+			Locale previousPoint = null;
+			Document doc;
+			List<Document> docs = new ArrayList<Document>();
+			boolean isFirst = true;
+
+			for (Locale point : pontList) {
+
+				if (isFirst) {
+					isFirst = false;
+					previousPoint = point;
+					continue;
+				}
+
+				doc = googleMapV2Direction.getDocument(
+						new LatLng(previousPoint.getLati(), previousPoint
+								.getLongi()),
+						new LatLng(point.getLati(), point.getLongi()),
+						GoogleMapV2Direction.MODE_OF_DRIVING);
+				docs.add(doc);
+				
+				previousPoint = point;
+
+			}
 
 			Log.d("-MY-", "after doc ");
 
-			Document[] docs = new Document[2];
-			docs[0] = doc;
-			docs[1] = doc2;
 			return docs;
 		}
 
 		@Override
-		protected void onPostExecute(Document[] docs) { // when done
-			
+		protected void onPostExecute(List<Document> docs) { // when done
+
 			mMessageView.setText("Directions are fetched successfully.");
 
-			ResultMapActivity.this.drawLine(docs[0]); // draws the line on map
-			ResultMapActivity.this.drawLine(docs[1]);
+			// Color.RED, Color.BLUE, Color.MAGENTA, Color.GREEN, Color.CYAN
+			int[] colors = { Color.RED, Color.BLUE, Color.MAGENTA, Color.GREEN, Color.CYAN };
+			int i = 0;
+
+			for (Document doc : docs) {
+				// draws the line on map
+				ResultMapActivity.this.drawLine(doc, colors[i % colors.length]);
+				i++;
+			}
 
 		}
 
@@ -200,21 +334,24 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 	}
 
 	/**
-	 * draws the line segments on map. should be called when Document from google api is returned
+	 * draws the line segments on map. should be called when Document from
+	 * google api is returned
 	 */
-	private void drawLine(Document doc) {
+	private void drawLine(Document doc, int clr) {
 
 		if (doc == null) {
 			Log.d("-MY-", "doc is null");
 			return;
 		}
-		ArrayList<LatLng> directionPoint = googleMapV2Direction.getDirection(doc);
+		ArrayList<LatLng> directionPoint = googleMapV2Direction
+				.getDirection(doc);
 
-		PolylineOptions rectLine = new PolylineOptions().width(3).color(Color.RED);
+		PolylineOptions rectLine = new PolylineOptions().width(4).color(clr);
 
 		for (int i = 0; i < directionPoint.size(); i++) {
 
-			rectLine.add(directionPoint.get(i));// add each point of the path to the polyline
+			rectLine.add(directionPoint.get(i));// add each point of the path to
+												// the polyline
 
 		}
 		mMap.addPolyline(rectLine);
@@ -232,23 +369,48 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 
 		googleMapV2Direction = new GoogleMapV2Direction();
 		coreMain = new CoreMain(getApplicationContext());
-		
+
 		// to get the previously saved position to initially pan to it
 		// markerLocation = new LatLng(latitude, longitude);
 		// markerLocation = PLACE2;
 
 		// Creates a draggable marker. Long press to drag.
-		// mMarker = mMap.addMarker(new MarkerOptions().position(markerLocation).title("Marker")
+		// mMarker = mMap.addMarker(new
+		// MarkerOptions().position(markerLocation).title("Marker")
 		// .snippet("testing").draggable(true));
 
 		mMessageView = (TextView) findViewById(R.id.tvMapMsg);
-//		tvLat = (TextView) findViewById(R.id.tvLat);
-//		tvLon = (TextView) findViewById(R.id.tvLon);
+		// tvLat = (TextView) findViewById(R.id.tvLat);
+		// tvLon = (TextView) findViewById(R.id.tvLon);
 
 		mMessageView.setText("-");
-//		tvLat.setText(Double.toString(sourceLatitude));
-//		tvLon.setText(Double.toString(sourceLongitude));
+		// tvLat.setText(Double.toString(sourceLatitude));
+		// tvLon.setText(Double.toString(sourceLongitude));
 
+		bShowDetails = (Button) findViewById(R.id.bShowDetailsMap);
+		bShowDetails.setEnabled(false);
+		bShowDetails.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+
+				// custom dialog
+				final DetailsDialog detailsDialog = new DetailsDialog(ResultMapActivity.this, details);
+				detailsDialog.setContentView(R.layout.dialog_details_layout);
+				detailsDialog.setTitle("Trip Details");
+				detailsDialog.show();
+				// if button is clicked, close the custom dialog
+				Button dialogButton = (Button) detailsDialog.findViewById(R.id.bDialogOk);
+				dialogButton.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						detailsDialog.dismiss();
+					}
+				});
+				
+			}
+		});
+		
 	}
 
 	private void setUpMapIfNeeded() {
@@ -256,8 +418,8 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 		// map.
 		if (mMap == null) {
 			// Try to obtain the map from the SupportMapFragment.
-			mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-					.getMap();
+			mMap = ((SupportMapFragment) getSupportFragmentManager()
+					.findFragmentById(R.id.map)).getMap();
 			// Check if we were successful in obtaining the map.
 			if (mMap != null) {
 
@@ -275,7 +437,8 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 	// These settings are the same as the settings for the map. They will in
 	// fact give you updates
 	// at the maximal rates currently possible.
-	private static final LocationRequest REQUEST = LocationRequest.create().setInterval(10000) // 10 seconds
+	private static final LocationRequest REQUEST = LocationRequest.create()
+			.setInterval(10000) // 10 seconds
 			.setFastestInterval(16) // 16ms = 60fps
 			.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
@@ -288,7 +451,8 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 
 	@Override
 	public boolean onMyLocationButtonClick() {
-		Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT)
+				.show();
 		// Return false so that we don't consume the event and the default
 		// behavior still occurs
 		// (the camera animates to the user's current position).
@@ -325,8 +489,8 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 	}
 
 	/**
-	 * Button to get current Location. This demonstrates how to get the current Location as required without needing to
-	 * register a LocationListener.
+	 * Button to get current Location. This demonstrates how to get the current
+	 * Location as required without needing to register a LocationListener.
 	 */
 	// public void showMyLocation(View view) {
 	// if (mLocationClient != null && mLocationClient.isConnected()) {
@@ -348,14 +512,15 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 			return; // return if map not ready
 		}
 
-		mMap.clear(); // to clear the existing marker
+		// mMap.clear(); // to clear the existing marker
 
 		// Creates a draggable marker. Long press to drag.
-		mMarker = mMap.addMarker(new MarkerOptions().position(location).title("Marker")
-				.snippet("testing").draggable(true));
+		// mMarker = mMap.addMarker(new
+		// MarkerOptions().position(location).title("Marker")
+		// .snippet("testing").draggable(true));
 
-//		showPosition(location);
-//		savePosition(location);
+		// showPosition(location);
+		// savePosition(location);
 
 	}
 
@@ -381,29 +546,35 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 
 		// Pan to see all markers in view.
 		// Cannot zoom to bounds until the map has a size.
-		final View mapView = getSupportFragmentManager().findFragmentById(R.id.map).getView();
+		final View mapView = getSupportFragmentManager().findFragmentById(
+				R.id.map).getView();
 		if (mapView.getViewTreeObserver().isAlive()) {
-			mapView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-				@SuppressWarnings("deprecation")
-				// We use the new method when supported
-				@SuppressLint("NewApi")
-				// We check which build version we are using.
-				@Override
-				public void onGlobalLayout() {
-					LatLngBounds bounds = new LatLngBounds.Builder().include(PLACE1)
-							.include(PLACE2)
-							.include(PLACE3)
-							// .include(markerLocation) // saved marker pos
+			mapView.getViewTreeObserver().addOnGlobalLayoutListener(
+					new OnGlobalLayoutListener() {
+						@SuppressWarnings("deprecation")
+						// We use the new method when supported
+						@SuppressLint("NewApi")
+						// We check which build version we are using.
+						@Override
+						public void onGlobalLayout() {
+							LatLngBounds bounds = new LatLngBounds.Builder()
+									.include(NORTH).include(SOUTH)
+									.include(WEST).include(EAST)
+									// .include(markerLocation) // saved marker
+									// pos
 
-							.build();
-					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-						mapView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-					} else {
-						mapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-					}
-					mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50));
-				}
-			});
+									.build();
+							if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+								mapView.getViewTreeObserver()
+										.removeGlobalOnLayoutListener(this);
+							} else {
+								mapView.getViewTreeObserver()
+										.removeOnGlobalLayoutListener(this);
+							}
+							mMap.moveCamera(CameraUpdateFactory
+									.newLatLngBounds(bounds, 50));
+						}
+					});
 		}
 	}
 
@@ -463,14 +634,14 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 	@Override
 	public void onMarkerDrag(Marker marker) {
 		LatLng location = marker.getPosition();
-//		showPosition(location);
+		// showPosition(location);
 	}
 
 	@Override
 	public void onMarkerDragEnd(Marker marker) {
 		LatLng location = marker.getPosition();
-//		showPosition(location);
-//		savePosition(location);
+		// showPosition(location);
+		// savePosition(location);
 	}
 
 	@Override
@@ -481,20 +652,20 @@ public class ResultMapActivity extends FragmentActivity implements OnMyLocationB
 
 	/* end of marker methods */
 
-//	// save location in prefs
-//	private void savePosition(LatLng location) {
-//
-//		prefHelp.savePref(ConstVals.PREF_KEY_LAT, location.latitude);
-//		prefHelp.savePref(ConstVals.PREF_KEY_LON, location.longitude);
-//
-//	}
-//
-//	// show lat and lon in text views
-//	private void showPosition(LatLng location) {
-//
-//		tvLat.setText(Double.toString(location.latitude));
-//		tvLon.setText(Double.toString(location.longitude));
-//
-//	}
+	// // save location in prefs
+	// private void savePosition(LatLng location) {
+	//
+	// prefHelp.savePref(ConstVals.PREF_KEY_LAT, location.latitude);
+	// prefHelp.savePref(ConstVals.PREF_KEY_LON, location.longitude);
+	//
+	// }
+	//
+	// // show lat and lon in text views
+	// private void showPosition(LatLng location) {
+	//
+	// tvLat.setText(Double.toString(location.latitude));
+	// tvLon.setText(Double.toString(location.longitude));
+	//
+	// }
 
 }

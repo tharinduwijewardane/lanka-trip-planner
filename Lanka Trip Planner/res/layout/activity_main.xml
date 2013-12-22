@@ -17,6 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:textStyle="bold"
             android:text="Number of days: " />
 
         <Spinner
@@ -39,6 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:textStyle="bold"
             android:text="Interests: " />
 
         <Spinner
@@ -61,6 +63,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:textStyle="bold"
             android:text="Prefered Region: " />
 
         <Spinner
@@ -84,6 +87,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:textStyle="bold"
             android:text="Start Location:" />
 
         <Button
@@ -91,6 +95,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="2"
+            style="@style/Button_A"
             android:text="Select" />
     </LinearLayout>
 
@@ -108,7 +113,27 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            style="@style/Button_A"
             android:text="Generate Plan" />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:weightSum="2" >
+
+        <Button
+            android:id="@+id/bShowDetails"
+            style="@style/Button_A"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Show Details" />
+
     </LinearLayout>
 
 </LinearLayout>

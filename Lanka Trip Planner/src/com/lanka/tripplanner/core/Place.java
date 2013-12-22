@@ -7,8 +7,8 @@ import java.util.Set;
 //represents places on the way
 public class Place extends Locale {
 
-	public Set<Neighbour> neighbours;
-	public String category;
+	Set<Neighbour> neighbours;
+	String category;
 
 	public Place(int aRating, int aTimetoVisit, String name, String aCategory) {
 		super("place"); // type is "place"
@@ -56,7 +56,7 @@ public class Place extends Locale {
 	}
 
 	public double[] getCoordinates() {
-		double[] coordinates = { super.x, super.y };
+		double[] coordinates = { super.lati, super.longi };
 		return coordinates;
 	}
 

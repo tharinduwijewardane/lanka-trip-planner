@@ -15,9 +15,10 @@ class Map {
 	// this should be called to get the best path
 	public ArrayList<Locale> getPath(String aCategory, String aProvince) {
 
-		ArrayList<Locale> path = new ArrayList<Locale>(); // path
-		Locale temp = source;
+		ArrayList<Locale> path = new ArrayList<Locale>(); // path - Places
+		Locale temp = source; // start from source
 
+		// for 'Any' type of category - receives null
 		String[] categories;
 		if (aCategory != null) {
 			if (aCategory.contains(",")) {
@@ -31,6 +32,7 @@ class Map {
 			categories[0] = "All";
 		}
 
+		// sites in 'Any' area
 		if (aProvince == null) {
 			aProvince = "All";
 		}
@@ -41,7 +43,7 @@ class Map {
 			// making sure path traveling time doesn't exceed the expected time
 			if (temp.timeOfPath + temp.timeToDestination < destination.expectedTime) {
 
-				// only visiting 14hrs for a day
+				// only visiting 14hrs for a day (14 * 60 = 840)
 				// checks whether visiting ends for the day
 				if (temp.timeOfPath > (840 * i)
 						&& path.get(path.size() - 1) != null) {
@@ -51,13 +53,14 @@ class Map {
 					path.add(dayDestination);
 					i++;
 				}
-
+				// add Place to path
 				path.add(temp);
 				temp.alreadyInPath = true;
 			} else {
 				break;
 			}
 
+			// obtain next best location from the current location
 			temp = getNextBestLoc(temp, categories, aProvince);
 		}
 		destination.timeOfPath = path.get(path.size() - 1).timeOfPath
@@ -67,15 +70,19 @@ class Map {
 		return path;
 	}
 
-	// get next best location to travel from a location
-	// out put may be null if a best location doesn't exsist
+	// get next best Locale to travel from a Locale
+	// out put may be null if a best Locale doesn't exist
 	public Locale getNextBestLoc(Locale loc, String[] categories,
 			String aProvince) {
-		boolean isNotInCategory = true;
+		boolean isNotInCategory = true; // not in the required category
 
+		// next best location to visit
 		Locale bestLoc = null;
 
+		//
 		int bestHeuristic = destination.expectedTime;
+
+		// considers every neighbour of current location
 		Iterator<Neighbour> ittr = loc.getNeighbours();
 		while (ittr.hasNext()) {
 			Neighbour neighbour = ittr.next();
@@ -85,7 +92,7 @@ class Map {
 				continue;
 			}
 
-			// if the neighbour location is already in the path
+			// if the neighbour Locale is already in the path
 			if (neighbour.loc.alreadyInPath) {
 				continue;
 			}
@@ -115,11 +122,13 @@ class Map {
 				continue;
 			}
 
+			// time traveled if the neighbour location is added
 			int timeTraveled = loc.timeOfPath + neighbour.timeToTravel
-					+ neighbour.loc.timeToVisit; // time traveled if the
-													// neighbour loc is added
+					+ neighbour.loc.timeToVisit;
+
+			// time from source to destination if the neighbour location is
+			// added
 			int timeToDest = timeTraveled + neighbour.loc.timeToDestination;
-			// time from source to destination if the neighbour loc is added
 
 			// if time to destination exceeds expected time
 			if (timeToDest > destination.expectedTime) {
@@ -129,12 +138,7 @@ class Map {
 			// heuristic value
 			// lowest huristic value is the best one here
 			// assumption: 1. rating can be taken only integers 0,1,2,3,4,5
-			// (timeToDest - timeTraveled) was the first part
-			int heuristicValue = (timeToDest) // TIME TO TRAVEL
-												// MUST BE
-												// REMOVED
-					// FOR A*
-					- (timeToDest - timeTraveled)
+			int heuristicValue = (timeToDest) - (timeToDest - timeTraveled)
 					* ((neighbour.loc.rating * 6) / 100);
 
 			// if a better heuristic value is found
@@ -144,6 +148,7 @@ class Map {
 				bestLoc = neighbour.loc;
 				bestLoc.timeOfPath = timeTraveled;
 				bestLoc.ratingOfPath = loc.ratingOfPath + bestLoc.rating;
+				System.out.println("Selected best : " + neighbour.loc.name);
 			}
 
 		}

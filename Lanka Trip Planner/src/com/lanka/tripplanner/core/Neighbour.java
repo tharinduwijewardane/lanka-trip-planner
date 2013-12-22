@@ -1,6 +1,6 @@
 package com.lanka.tripplanner.core;
 
-class Neighbour {
+public class Neighbour {
 	public int timeToTravel; // traveling time from a location
 	public Locale loc; // neighbour location
 

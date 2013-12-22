@@ -1,6 +1,7 @@
 package com.lanka.tripplanner.util;
 
 import java.util.ArrayList;
+
 import com.lanka.tripplanner.core.Place;
 
 import android.content.ContentValues;
@@ -38,18 +39,13 @@ public class Database {
 
 	private static class DbHelper extends SQLiteOpenHelper {
 
-		private static final String TABLE_PLACE_CREATE = "create table "
-				+ DATABASE_TABLE_PLACE + " (" + KEY_ROWID
-				+ " integer primary key autoincrement, " + KEY_NAME
-				+ " varchar(50), " + KEY_LATITUDE + " real, " + KEY_LONGITUDE
-				+ " real, " + KEY_CATEGORY + " text, " + KEY_RATING
-				+ " integer, " + KEY_VISITING_TIME + " integer, "
-				+ KEY_PROVINCE + " text);";
+		private static final String TABLE_PLACE_CREATE = "create table " + DATABASE_TABLE_PLACE + " (" + KEY_ROWID
+				+ " integer primary key autoincrement, " + KEY_NAME + " varchar(50), " + KEY_LATITUDE + " real, "
+				+ KEY_LONGITUDE + " real, " + KEY_CATEGORY + " text, " + KEY_RATING + " integer, " + KEY_VISITING_TIME
+				+ " integer, " + KEY_PROVINCE + " text);";
 
-		private static final String TABLE_TIME_CREATE = "create table "
-				+ DATABASE_TABLE_TIME + " (" + KEY_ROWID
-				+ " integer primary key autoincrement, " + KEY_FROM
-				+ " varchar(50), " + KEY_TO + " varchar(50), "
+		private static final String TABLE_TIME_CREATE = "create table " + DATABASE_TABLE_TIME + " (" + KEY_ROWID
+				+ " integer primary key autoincrement, " + KEY_FROM + " varchar(50), " + KEY_TO + " varchar(50), "
 				+ KEY_TIME_TO_TRAVEL + " text);";
 
 		DbHelper(Context context) {
@@ -71,26 +67,18 @@ public class Database {
 			Place tempPlace;
 			for (int i = 0; i < initPlaces.length; i++) {
 				tempPlace = initPlaces[i];
-				db.execSQL("INSERT INTO " + DATABASE_TABLE_PLACE + " ("
-						+ KEY_NAME + "," + KEY_LATITUDE + "," + KEY_LONGITUDE
-						+ "," + KEY_CATEGORY + "," + KEY_RATING + ","
-						+ KEY_VISITING_TIME + "," + KEY_PROVINCE
-						+ ") VALUES ('" + tempPlace.getName() + "',"
-						+ tempPlace.getLati() + "," + tempPlace.getLongi()
-						+ ",'" + tempPlace.getCategory() + "',"
-						+ tempPlace.getRating() + ","
-						+ tempPlace.getTimeToVisit() + ",'"
-						+ tempPlace.getProvince() + "');");
+				db.execSQL("INSERT INTO " + DATABASE_TABLE_PLACE + " (" + KEY_NAME + "," + KEY_LATITUDE + ","
+						+ KEY_LONGITUDE + "," + KEY_CATEGORY + "," + KEY_RATING + "," + KEY_VISITING_TIME + ","
+						+ KEY_PROVINCE + ") VALUES ('" + tempPlace.getName() + "'," + tempPlace.getLati() + ","
+						+ tempPlace.getLongi() + ",'" + tempPlace.getCategory() + "'," + tempPlace.getRating() + ","
+						+ tempPlace.getTimeToVisit() + ",'" + tempPlace.getProvince() + "');");
 			}
 
 			for (int j = 0; j < initPlaces.length; j++) {
 				for (int k = 0; k < initPlaces.length; k++) {
-					db.execSQL("INSERT INTO " + DATABASE_TABLE_TIME + " ("
-							+ KEY_FROM + "," + KEY_TO + ","
-							+ KEY_TIME_TO_TRAVEL + ") VALUES ('"
-							+ initPlaces[j].getName() + "','"
-							+ initPlaces[k].getName() + "',"
-							+ initDurations[j][k] + ");");
+					db.execSQL("INSERT INTO " + DATABASE_TABLE_TIME + " (" + KEY_FROM + "," + KEY_TO + ","
+							+ KEY_TIME_TO_TRAVEL + ") VALUES ('" + initPlaces[j].getName() + "','"
+							+ initPlaces[k].getName() + "'," + initDurations[j][k] + ");");
 				}
 			}
 		}
@@ -139,7 +127,8 @@ public class Database {
 	 * insert a Place entry.
 	 * 
 	 * use as follows Database mDatabase = new Database(getActivity());
-	 * mDatabase.openForWrite(); mDatabase.insertEntry(place);
+	 * mDatabase.openForWrite();
+	 * mDatabase.insertEntry(place);
 	 * mDatabase.close();
 	 * 
 	 * @param place
@@ -188,10 +177,8 @@ public class Database {
 
 		int timeToTravel;
 
-		Cursor c = mSqLiteDatabase.query(DATABASE_TABLE_TIME,
-				new String[] { KEY_TIME_TO_TRAVEL }, KEY_FROM + " = '" + from
-						+ "' AND " + KEY_TO + " = '" + to + "';", null, null,
-				null, null, null);
+		Cursor c = mSqLiteDatabase.query(DATABASE_TABLE_TIME, new String[] { KEY_TIME_TO_TRAVEL }, KEY_FROM + " = '"
+				+ from + "' AND " + KEY_TO + " = '" + to + "';", null, null, null, null, null);
 
 		if (c != null) {
 			c.moveToFirst();
@@ -211,11 +198,9 @@ public class Database {
 
 		ArrayList<Place> places = new ArrayList<Place>();
 
-		String[] columns = new String[] { KEY_ROWID, KEY_NAME, KEY_LATITUDE,
-				KEY_LONGITUDE, KEY_CATEGORY, KEY_RATING, KEY_VISITING_TIME,
-				KEY_PROVINCE };
-		Cursor c = mSqLiteDatabase.query(DATABASE_TABLE_PLACE, columns, null,
-				null, null, null, null);
+		String[] columns = new String[] { KEY_ROWID, KEY_NAME, KEY_LATITUDE, KEY_LONGITUDE, KEY_CATEGORY, KEY_RATING,
+				KEY_VISITING_TIME, KEY_PROVINCE };
+		Cursor c = mSqLiteDatabase.query(DATABASE_TABLE_PLACE, columns, null, null, null, null, null);
 
 		int iRowId = c.getColumnIndex(KEY_ROWID);
 		int iName = c.getColumnIndex(KEY_NAME);
@@ -236,8 +221,7 @@ public class Database {
 			int visitingTime = c.getInt(iVisitingTime);
 			String province = c.getString(iProvince);
 
-			Place place = new Place(rating, visitingTime, name, latitude,
-					longitude, category, province);
+			Place place = new Place(rating, visitingTime, name, latitude, longitude, category, province);
 			places.add(place);
 		}
 

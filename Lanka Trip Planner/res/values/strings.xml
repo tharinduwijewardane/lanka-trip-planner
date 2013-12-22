@@ -7,11 +7,13 @@
     <string name="instructions">Long click on map to select starting location</string>
     
     <string-array name="categories">
+        <item >-Any-</item>
         <item >Nature</item>
         <item >History</item>
     </string-array>
     
     <string-array name="Regions">
+        <item >-Any-</item>
         <item >Kandy</item>
         <item >Anuradhapura</item>
         <item >Katharagama</item>
